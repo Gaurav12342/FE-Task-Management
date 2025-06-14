@@ -11,7 +11,7 @@ import { createTaskAPI } from "../../redux/Task/createTaskSlice";
 import { fetchTaskListAPI } from "../../redux/Task/listsTaskSlice";
 import { useEffect, useState } from "react";
 import { updateTaskAPI } from "../../redux/Task/updateTaskSlice";
-import { PRIORITY } from "../../constants/constant";
+import { PRIORITY, STATUS } from "../../constants/constant";
 
 interface IProps {
   setIsOpen?: any;
@@ -21,7 +21,13 @@ interface IProps {
 
 const Form = ({ setIsOpen, selectedTask, paginationModel }: IProps) => {
   const dispatch = useDispatch();
-  const { register, handleSubmit, reset, setValue } = useForm();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    formState: { errors },
+  } = useForm();
   const isLoadingTaskCreate = useSelector((state: any) => state.createdTask);
   const isLoadingTaskUpdate = useSelector((state: any) => state.updateTask);
 
@@ -33,6 +39,7 @@ const Form = ({ setIsOpen, selectedTask, paginationModel }: IProps) => {
       setValue("description", selectedTask?.description);
       setValue("dueDate", selectedTask?.dueDate);
       setValue("priority", selectedTask?.priority);
+      setValue("status", selectedTask?.status);
     }
   }, [selectedTask, setValue]);
 
@@ -95,6 +102,9 @@ const Form = ({ setIsOpen, selectedTask, paginationModel }: IProps) => {
                 label="Title"
                 {...register("title", { required: true })}
               />
+              <span className="text-sm block text-red-500">
+                {errors.title ? "This field is required" : ""}
+              </span>
             </div>
             <div>
               <CustomLabel htmlFor="lname" className="text-black">
@@ -105,6 +115,9 @@ const Form = ({ setIsOpen, selectedTask, paginationModel }: IProps) => {
                 placeholder="Description"
                 {...register("description", { required: true })}
               />
+              <span className="text-sm block text-red-500">
+                {errors.description ? "This field is required" : ""}
+              </span>
             </div>
             <div>
               <CustomLabel htmlFor="email" className="text-black">
@@ -115,6 +128,9 @@ const Form = ({ setIsOpen, selectedTask, paginationModel }: IProps) => {
                 label="Due Date"
                 {...register("dueDate", { required: true })}
               />
+              <span className="text-sm block text-red-500">
+                {errors.dueDate ? "This field is required" : ""}
+              </span>
             </div>
             <div className="relative">
               <CustomLabel htmlFor="password" className="text-black">
@@ -126,30 +142,39 @@ const Form = ({ setIsOpen, selectedTask, paginationModel }: IProps) => {
                 {...register("priority", { required: true })}
                 options={PRIORITY}
               />
+              <span className="text-sm block text-red-500">
+                {errors.priority ? "This field is required" : ""}
+              </span>
+            </div>
+            <div className="relative">
+              <CustomLabel htmlFor="password" className="text-black">
+                Status
+              </CustomLabel>
+              <CustomSelect
+                id="status"
+                label="Status"
+                {...register("status", { required: true })}
+                options={STATUS}
+              />
+              <span className="text-sm block text-red-500">
+                {errors.status ? "This field is required" : ""}
+              </span>
             </div>
           </div>
 
-          <div className="flex gap-4">
-            <CustomButton
-              isLoading={isLoading ?? false}
-              className="w-[120px]"
-              type="submit"
-            >
+          <div className="flex gap-4 w-[50%]">
+            <CustomButton isLoading={isLoading ?? false} type="submit">
               {selectedTask ? "Update" : "Create"}
             </CustomButton>
             <CustomButton
-              className="bg-white text-black border-blue-500 w-[120px]"
+              className="bg-white text-black border-blue-500"
               type="button"
               variant="outline"
               onClick={handleResetForm}
             >
               Reset
             </CustomButton>
-            <CustomButton
-              onClick={handleCloseDrawer}
-              className="w-[120px]"
-              type="button"
-            >
+            <CustomButton onClick={handleCloseDrawer} type="button">
               Back
             </CustomButton>
           </div>

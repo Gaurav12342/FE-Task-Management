@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { DataGrid } from "@mui/x-data-grid";
-import Paper from "@mui/material/Paper";
+import { Paper, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchTaskListAPI } from "../../redux/Task/listsTaskSlice";
@@ -34,7 +34,7 @@ export const Dashboard = () => {
 
   const dispatch = useDispatch();
   const selectorData = useSelector((state: any) => state?.taskLists);
-
+  console.log("selectorData =>", selectorData);
   useEffect(() => {
     fetchTasks();
   }, [paginationModel.page, paginationModel.pageSize]);
@@ -127,6 +127,11 @@ export const Dashboard = () => {
       width: 300,
     },
     {
+      field: "status",
+      headerName: "Status",
+      width: 300,
+    },
+    {
       field: "action",
       headerName: "Action",
       width: 150,
@@ -182,7 +187,7 @@ export const Dashboard = () => {
 
         <Paper sx={{ height: 500, width: "100%" }}>
           <DataGrid
-            loading={rows?.length ? false : true}
+            loading={selectorData?.loading ?? false}
             rows={rows ?? []}
             columns={columns}
             initialState={{ pagination: { paginationModel } }}
@@ -191,6 +196,19 @@ export const Dashboard = () => {
             rowCount={totalCount}
             paginationMode="server"
             sx={{ border: 0, padding: 2 }}
+            slots={{
+              noRowsOverlay: () => (
+                <Typography
+                  variant="body1"
+                  sx={{
+                    p: 2,
+                    textAlign: "center",
+                  }}
+                >
+                  No records found.
+                </Typography>
+              ),
+            }}
           />
         </Paper>
       </div>
