@@ -1,32 +1,29 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
 
-const userToken: any = localStorage.getItem("user-token");
-const isLogged: any = JSON.parse(userToken);
 const baseurl = import.meta.env.VITE_API_URL;
 
-if (isLogged) {
-  axios.defaults.baseURL = baseurl;
-  axios.defaults.headers.common["Authorization"] = `Bearer ${isLogged}`;
-  axios.defaults.headers.post["Content-Type"] = "application/json";
+const api = axios.create({
+  baseURL: baseurl,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
-  axios.interceptors.request.use(
-    (request) => {
-      return request;
-    },
-    (error) => {
-      return Promise.reject(error);
+// 🔁 Dynamically set token before each request
+api.interceptors.request.use(
+  (request) => {
+    const tokenString = localStorage.getItem("user-token");
+    const token = tokenString ? JSON.parse(tokenString) : null;
+
+    if (token) {
+      request.headers.Authorization = `Bearer ${token}`;
+    } else {
+      delete request.headers.Authorization;
     }
-  );
 
-  axios.interceptors.response.use(
-    (response) => {
-      return response;
-    },
-    (error) => {
-      return Promise.reject(error);
-    }
-  );
-}
+    return request;
+  },
+  (error) => Promise.reject(error)
+);
 
-export default axios;
+export default api;

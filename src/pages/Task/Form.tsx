@@ -6,7 +6,7 @@ import { CustomLabel } from "../../components/ui/label";
 import { CustomTextarea } from "../../components/ui/textarea";
 import { CustomDatePicker } from "../../components/ui/datePicker";
 import { CustomSelect } from "../../components/ui/select";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { createTaskAPI } from "../../redux/Task/createTaskSlice";
 import { fetchTaskListAPI } from "../../redux/Task/listsTaskSlice";
 import { useEffect, useState } from "react";
@@ -28,9 +28,6 @@ const Form = ({ setIsOpen, selectedTask, paginationModel }: IProps) => {
     setValue,
     formState: { errors },
   } = useForm();
-  const isLoadingTaskCreate = useSelector((state: any) => state.createdTask);
-  const isLoadingTaskUpdate = useSelector((state: any) => state.updateTask);
-
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -44,29 +41,30 @@ const Form = ({ setIsOpen, selectedTask, paginationModel }: IProps) => {
   }, [selectedTask, setValue]);
 
   const onSubmit = async (data: any) => {
+    setIsLoading(true);
     try {
       if (selectedTask) {
         const updatedTask = {
           ...data,
           id: selectedTask?._id,
         };
-        await dispatch(updateTaskAPI(updatedTask));
+        const response = await dispatch(updateTaskAPI(updatedTask));
         dispatch(
           fetchTaskListAPI({
             page: paginationModel.page + 1,
             limit: paginationModel.pageSize,
           })
         );
-        setIsLoading(isLoadingTaskUpdate?.loading ?? false);
+        setIsLoading(response?.payload?.code === "Update" ? false : false);
       } else {
         await dispatch(createTaskAPI(data));
-        dispatch(
+        const response = dispatch(
           fetchTaskListAPI({
             page: paginationModel.page + 1,
             limit: paginationModel.pageSize,
           })
         );
-        setIsLoading(isLoadingTaskCreate?.loading ?? false);
+        setIsLoading(response?.payload?.code === "Created" ? false : false);
       }
       setIsOpen(false);
     } catch (error) {

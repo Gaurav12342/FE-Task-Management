@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { DataGrid } from "@mui/x-data-grid";
-import { Paper, Typography } from "@mui/material";
+import { Chip, Paper, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchTaskListAPI } from "../../redux/Task/listsTaskSlice";
@@ -17,6 +17,7 @@ import ConfirmDialog from "../../components/confirm-dialoag";
 import { deleteTaskAPI } from "../../redux/Task/deleteTaskSlice";
 import { CustomInput } from "../../components/ui/input";
 import useDebounce from "../../hook/useDebounce";
+import { capitalize } from "../../utils/capitalization";
 
 export const Dashboard = () => {
   const [rows, setRows] = useState<any>([]);
@@ -34,7 +35,6 @@ export const Dashboard = () => {
 
   const dispatch = useDispatch();
   const selectorData = useSelector((state: any) => state?.taskLists);
-  console.log("selectorData =>", selectorData);
   useEffect(() => {
     fetchTasks();
   }, [paginationModel.page, paginationModel.pageSize]);
@@ -125,11 +125,25 @@ export const Dashboard = () => {
       field: "priority",
       headerName: "Priority",
       width: 300,
+      renderCell: (row: any) => (
+        <Chip
+          color="primary"
+          variant="outlined"
+          label={capitalize(row?.row?.priority)}
+        />
+      ),
     },
     {
       field: "status",
       headerName: "Status",
       width: 300,
+      renderCell: (row: any) => (
+        <Chip
+          color="primary"
+          variant="outlined"
+          label={capitalize(row?.row?.status)}
+        />
+      ),
     },
     {
       field: "action",
